@@ -1,0 +1,19 @@
+name: build git-gateway
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: docker build -t ghcr.io/ohyama4z/git-gateway git-gateway
+    - run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ohyama4z --password-stdin
+    - run: |
+      tag=$(date --date='TZ="Asia/Tokyo"' "+%Y%m%d-%H%M")
+      docker tag ghcr.io/ohyama4z/git-gateway ghcr.io/ohyama4z/git-gateway:$tag
+      docker push ghcr.io/ohyama4z/git-gateway:$tag
+      docker push ghcr.io/ohyama4z/git-gateway:latest

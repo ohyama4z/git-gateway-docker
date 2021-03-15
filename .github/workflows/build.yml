@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'true'
     - run: docker build -t ghcr.io/ohyama4z/git-gateway git-gateway
     - run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ohyama4z --password-stdin
     - run: |
@@ -17,3 +19,4 @@ jobs:
         docker tag ghcr.io/ohyama4z/git-gateway ghcr.io/ohyama4z/git-gateway:$tag
         docker push ghcr.io/ohyama4z/git-gateway:$tag
         docker push ghcr.io/ohyama4z/git-gateway:latest
+

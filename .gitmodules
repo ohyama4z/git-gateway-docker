@@ -1,0 +1,3 @@
+[submodule "git-gateway"]
+	path = git-gateway
+	url = https://github.com/netlify/git-gateway.git

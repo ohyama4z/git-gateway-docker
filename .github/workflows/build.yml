@@ -15,7 +15,7 @@ jobs:
     - run: docker build -t ghcr.io/ohyama4z/git-gateway git-gateway
     - run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ohyama4z --password-stdin
     - run: |
-        tag=$(date --date='TZ="Asia/Tokyo"' "+%Y%m%d-%H%M")
+        tag=$(TZ=Asia/Tokyo date +%Y%m%d-%H%M)
         docker tag ghcr.io/ohyama4z/git-gateway ghcr.io/ohyama4z/git-gateway:$tag
         docker push ghcr.io/ohyama4z/git-gateway:$tag
         docker push ghcr.io/ohyama4z/git-gateway:latest

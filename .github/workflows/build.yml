@@ -3,20 +3,23 @@ name: build git-gateway
 on:
   push:
     branches:
-    - master
+      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: 'true'
-    - run: docker build -t ghcr.io/ohyama4z/git-gateway git-gateway
-    - run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ohyama4z --password-stdin
-    - run: |
-        tag=$(TZ=Asia/Tokyo date +%Y%m%d-%H%M)
-        docker tag ghcr.io/ohyama4z/git-gateway ghcr.io/ohyama4z/git-gateway:$tag
-        docker push ghcr.io/ohyama4z/git-gateway:$tag
-        docker push ghcr.io/ohyama4z/git-gateway:latest
+      - uses: actions/checkout@v2
+        with:
+          submodules: "true"
+      - run: docker build -t ghcr.io/ohyama4z/git-gateway git-gateway
+      - run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ohyama4z --password-stdin
+      - run: |
+          tag=$(TZ=Asia/Tokyo date +%Y%m%d-%H%M)
+          docker tag ghcr.io/ohyama4z/git-gateway ghcr.io/ohyama4z/git-gateway:$tag
+          docker push ghcr.io/ohyama4z/git-gateway:$tag
+          docker push ghcr.io/ohyama4z/git-gateway:latest
 
+          docker tag ghcr.io/ohyama4z/git-gateway asia.gcr.io/tomakako/git-gateway:$tag
+          docker push asia.gcr.io/tomakako/git-gateway:$tag
+          docker push asia.gcr.io/tomakako/git-gateway:latest

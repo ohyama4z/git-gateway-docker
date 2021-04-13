@@ -15,10 +15,11 @@ jobs:
             echo '::set-output name=TAG::$tag'
         id: tag-generator
 
-      - name: ghcrへのプッシュ
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
           submodules: "true"
+
+      - name: ghcrへのプッシュ
         run: docker build -t git-gateway-image git-gateway
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ohyama4z --password-stdin
         run: |
@@ -33,7 +34,9 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
-        run: gcloud auth configure-docker --quiet
-        run: | 
+
+      - name: gcrへのプッシュ
+        run: |
+          gcloud auth configure-docker --quiet
           docker tag git-gateway-image asia.gcr.io/tomakako/git-gateway:${{ steps.tag-generator.outputs.TAG }}
           docker push asia.gcr.io/tomakako/git-gateway:${{ steps.tag-generator.outputs.TAG }}

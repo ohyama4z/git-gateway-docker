@@ -15,6 +15,7 @@ jobs:
           echo '::set-output name=TAG::$tag'
         id: tag-generator
 
+      - run: echo "${{ steps.tag-generator.outputs.TAG }}"
       - uses: actions/checkout@v2
         with:
           submodules: "true"

@@ -15,7 +15,6 @@ jobs:
           echo "::set-output name=TAG::${tag}"
         id: tag-generator
 
-      - run: echo "${{ steps.tag-generator.outputs.TAG }}"
       - uses: actions/checkout@v2
         with:
           submodules: "true"
@@ -25,6 +24,7 @@ jobs:
           docker build -t git-gateway-image git-gateway
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ohyama4z --password-stdin
           docker tag git-gateway-image ghcr.io/ohyama4z/git-gateway:${{ steps.tag-generator.outputs.TAG }}
+          docker tag git-gateway-image ghcr.io/ohyama4z/git-gateway:latest
           docker push ghcr.io/ohyama4z/git-gateway:${{ steps.tag-generator.outputs.TAG }}
           docker push ghcr.io/ohyama4z/git-gateway:latest
 

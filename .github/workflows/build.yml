@@ -9,17 +9,31 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: タグ用の変数生成
+        run: |
+            tag=$(TZ=Asia/Tokyo date +%Y%m%d-%H%M)
+            echo '::set-output name=TAG::$tag'
+        id: tag-generator
+
+      - name: ghcrへのプッシュ
+        uses: actions/checkout@v2
         with:
           submodules: "true"
-      - run: docker build -t ghcr.io/ohyama4z/git-gateway git-gateway
-      - run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ohyama4z --password-stdin
-      - run: |
-          tag=$(TZ=Asia/Tokyo date +%Y%m%d-%H%M)
-          docker tag ghcr.io/ohyama4z/git-gateway ghcr.io/ohyama4z/git-gateway:$tag
-          docker push ghcr.io/ohyama4z/git-gateway:$tag
-          docker push ghcr.io/ohyama4z/git-gateway:latest
+        run: docker build -t git-gateway-image git-gateway
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ohyama4z --password-stdin
+        run: |
+            docker tag git-gateway-image ghcr.io/ohyama4z/git-gateway:${{ steps.tag-generator.outputs.TAG }}
+            docker push ghcr.io/ohyama4z/git-gateway:${{ steps.tag-generator.outputs.TAG }}
+            docker push ghcr.io/ohyama4z/git-gateway:latest
 
-          docker tag ghcr.io/ohyama4z/git-gateway asia.gcr.io/tomakako/git-gateway:$tag
-          docker push asia.gcr.io/tomakako/git-gateway:$tag
-          docker push asia.gcr.io/tomakako/git-gateway:latest
+      - name: Google SDKのセットアップ
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          version: '290.0.1'
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+        run: gcloud auth configure-docker --quiet
+        run: | 
+          docker tag git-gateway-image asia.gcr.io/tomakako/git-gateway:${{ steps.tag-generator.outputs.TAG }}
+          docker push asia.gcr.io/tomakako/git-gateway:${{ steps.tag-generator.outputs.TAG }}

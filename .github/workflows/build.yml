@@ -11,8 +11,8 @@ jobs:
     steps:
       - name: タグ用の変数生成
         run: |
-            tag=$(TZ=Asia/Tokyo date +%Y%m%d-%H%M)
-            echo '::set-output name=TAG::$tag'
+          tag=$(TZ=Asia/Tokyo date +%Y%m%d-%H%M)
+          echo '::set-output name=TAG::$tag'
         id: tag-generator
 
       - uses: actions/checkout@v2
@@ -20,17 +20,17 @@ jobs:
           submodules: "true"
 
       - name: ghcrへのプッシュ
-        run: docker build -t git-gateway-image git-gateway
-        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ohyama4z --password-stdin
         run: |
-            docker tag git-gateway-image ghcr.io/ohyama4z/git-gateway:${{ steps.tag-generator.outputs.TAG }}
-            docker push ghcr.io/ohyama4z/git-gateway:${{ steps.tag-generator.outputs.TAG }}
-            docker push ghcr.io/ohyama4z/git-gateway:latest
+          docker build -t git-gateway-image git-gateway
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ohyama4z --password-stdin
+          docker tag git-gateway-image ghcr.io/ohyama4z/git-gateway:${{ steps.tag-generator.outputs.TAG }}
+          docker push ghcr.io/ohyama4z/git-gateway:${{ steps.tag-generator.outputs.TAG }}
+          docker push ghcr.io/ohyama4z/git-gateway:latest
 
       - name: Google SDKのセットアップ
         uses: google-github-actions/setup-gcloud@master
         with:
-          version: '290.0.1'
+          version: "290.0.1"
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
